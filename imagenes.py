@@ -4,7 +4,6 @@ import threading
 import time
 from datetime import datetime
 
-
 def producer(image_queue: queue.Queue, max_interval: float, sources: list):
     image_id = 1
     while True:
@@ -18,7 +17,6 @@ def producer(image_queue: queue.Queue, max_interval: float, sources: list):
         print(f"[RECEPCIÓN] Imagen {image[0]} de {image[1]} almacenada en cola.")
         image_id += 1
 
-
 def consumer(image_queue: queue.Queue, processing_time: float):
     while True:
         item = image_queue.get()
@@ -27,7 +25,6 @@ def consumer(image_queue: queue.Queue, processing_time: float):
         time.sleep(random.uniform(0.5, processing_time))
         print(f"[PROCESO] Imagen {image_id} procesada.")
         image_queue.task_done()
-
 
 def main():
     queue_size = 10
