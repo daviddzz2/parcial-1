@@ -14,8 +14,10 @@ python imagenes.py
 
 Este programa genera imágenes de forma indefinida y las procesa usando una cola FIFO. El programa se ejecuta hasta que lo detengas con Ctrl+C.
 
-Si quieres cambiar los valores, edita las variables dentro de `imagenes.py`:
+Al iniciar, el programa preguntará al usuario por los valores de configuración y ofrecerá recomendaciones predeterminadas:
 
-- `queue_size`
-- `max_producer_interval`
-- `max_consumer_time`
+- tamaño de la cola FIFO
+- intervalo máximo de llegada de imágenes
+- tiempo máximo de procesamiento por imagen
+- número de satélites simulados
+- número de consumidores simultáneos

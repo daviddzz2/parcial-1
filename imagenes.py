@@ -26,28 +26,67 @@ def consumer(image_queue: queue.Queue, processing_time: float):
         print(f"[PROCESO] Imagen {image_id} procesada.")
         image_queue.task_done()
 
-def main():
-    queue_size = 10
-    max_producer_interval = 1.5
-    max_consumer_time = 5
 
+def prompt_int(message: str, default: int) -> int:
+    raw = input(f"{message} [{default}]: ").strip()
+    if raw == "":
+        return default
+    try:
+        value = int(raw)
+        if value <= 0:
+            raise ValueError
+        return value
+    except ValueError:
+        print(f"Entrada no válida. Se usará el valor recomendado {default}.")
+        return default
+
+
+def prompt_float(message: str, default: float) -> float:
+    raw = input(f"{message} [{default}]: ").strip()
+    if raw == "":
+        return default
+    try:
+        value = float(raw)
+        if value <= 0:
+            raise ValueError
+        return value
+    except ValueError:
+        print(f"Entrada no válida. Se usará el valor recomendado {default}.")
+        return default
+
+
+def main():
+    print("Configuración inicial del sistema de imágenes satelitales")
+    queue_size = prompt_int("Tamaño de la cola FIFO (recomendado 10)", 10)
+    max_producer_interval = prompt_float("Intervalo máximo de llegada de imágenes en segundos (recomendado 1.5)", 1.5)
+    max_consumer_time = prompt_float("Tiempo máximo de procesamiento por imagen en segundos (recomendado 5)", 5.0)
+    satellite_count = prompt_int("Número de satélites a simular (recomendado 3)", 3)
+    consumer_count = prompt_int("Número de consumidores simultáneos (recomendado 2)", 2)
+
+    sources = [f"Satélite {i + 1}" for i in range(satellite_count)]
     image_queue = queue.Queue(maxsize=queue_size)
-    sources = ["Satélite A", "Satélite B", "Satélite C"]
 
     producer_thread = threading.Thread(
         target=producer,
         args=(image_queue, max_producer_interval, sources),
         daemon=True,
     )
-    consumer_thread = threading.Thread(
-        target=consumer,
-        args=(image_queue, max_consumer_time),
-        daemon=True,
-    )
+    producer_thread.start()
+
+    consumer_threads = []
+    for i in range(consumer_count):
+        thread = threading.Thread(
+            target=consumer,
+            args=(image_queue, max_consumer_time),
+            daemon=True,
+        )
+        thread.start()
+        consumer_threads.append(thread)
 
     print("Iniciando el sistema de recepción y procesamiento de imágenes...")
-    producer_thread.start()
-    consumer_thread.start()
+    print(f"Satélites en origen: {satellite_count}")
+    print(f"Consumidores activos: {consumer_count}")
+    print("Pulse Ctrl+C para detener el programa.")
 
     try:
         while True:
